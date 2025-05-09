@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "578355378717",
+    "project_id": "oneminuteapp-ede00",
+    "storage_bucket": "oneminuteapp-ede00.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:578355378717:android:32542a4f2e042a10f9e4f4",
+        "android_client_info": {
+          "package_name": "com.example.one_minute_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBFxNduCfxjrxv7pEO9lornpmdcfKW5-7Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
