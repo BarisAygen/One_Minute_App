@@ -28,7 +28,14 @@ class _TaskPageState extends State<TaskPage> {
     final today = DateTime.now().toIso8601String().substring(0, 10);
     final docRef = firestore.collection('daily_tasks').doc(userId);
     final doc = await docRef.get();
+    final lastDoc = await docRef.get();
 
+    if (lastDoc.exists && lastDoc['date'] != today) {
+      if (lastDoc['completed'] == false) {
+        await firestore.collection('users').doc(userId).update({'streak': 0});
+        debugPrint('Streak resetlendi çünkü dün tamamlanmamıştı.');
+      }
+    }
     if (doc.exists && doc['date'] == today) {
       // Eğer bugün zaten atanmış görev varsa
       final taskDoc =
@@ -98,7 +105,77 @@ class _TaskPageState extends State<TaskPage> {
       'xp': FieldValue.increment(10),
       'streak': FieldValue.increment(1),
     });
+    // 3) Güncel kullanıcı verisini çek
+    final userSnap = await firestore.collection('users').doc(userId).get();
+    final data = userSnap.data()!;
+    final int streak = data['streak'] ?? 0;
+    final int xp = data['xp'] ?? 0;
+    final List<String> badges = List<String>.from(data['badges'] ?? []);
 
+    // 4) arkadaş sayısını çek (Sosyal Kuş Rozeti için)
+    final friendsSnap =
+        await firestore
+            .collection('users')
+            .doc(userId)
+            .collection('friends')
+            .get();
+    final int friendCount = friendsSnap.docs.length;
+
+    // 5) kayıt tarihinden beri geçen günü hesapla (Sadakat Rozeti için)
+    final creationTime =
+        FirebaseAuth.instance.currentUser!.metadata.creationTime!;
+    final int daysSinceSignup = DateTime.now().difference(creationTime).inDays;
+
+    // 6) Hangi rozetleri vermen gerektiğini kontrol et
+    final toAward = <String>[];
+
+    // — İlk Görev Rozeti
+    // (history koleksiyonundaki doküman sayısını da kullanabilirsin)
+    if (!badges.contains('ilk_gorev')) {
+      final historyCount = await firestore
+          .collection('users')
+          .doc(userId)
+          .collection('history')
+          .get()
+          .then((snap) => snap.docs.length);
+      if (historyCount >= 1) {
+        toAward.add('ilk_gorev');
+      }
+    }
+
+    // — 10 Görev Rozeti
+    if (xp >= 100 /*10 görev×10xp*/ && !badges.contains('onluk')) {
+      toAward.add('onluk');
+    }
+
+    // — 50 Görev Rozeti
+    if (xp >= 500 /*50 görev×10xp*/ && !badges.contains('elli')) {
+      toAward.add('elli');
+    }
+
+    // — Aylık Sadakat Rozeti (30 gün streak)
+    if (streak >= 30 && !badges.contains('aylik_sadakat')) {
+      toAward.add('aylik_sadakat');
+    }
+
+    // — Sosyal Kuş Rozeti (10 arkadaş)
+    if (friendCount >= 10 && !badges.contains('sosyal')) {
+      toAward.add('sosyal');
+    }
+
+    // — Sadakat Rozeti (365 gün kullanım)
+    if (daysSinceSignup >= 365 && !badges.contains('sadakat')) {
+      toAward.add('sadakat');
+    }
+
+    // 7) Yeni rozetleri Firestore'a ekle
+    if (toAward.isNotEmpty) {
+      await firestore.collection('users').doc(userId).update({
+        'badges': FieldValue.arrayUnion(toAward),
+      });
+    }
+
+    // 8) UI güncellemesi
     setState(() => isCompleted = true);
   }
 

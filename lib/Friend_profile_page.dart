@@ -14,12 +14,35 @@ class FriendProfilePage extends StatefulWidget {
 class _FriendProfilePageState extends State<FriendProfilePage> {
   final _firestore = FirebaseFirestore.instance;
   late final String _currentUid;
-
+  String? _avatarUrl;
+  List<String> _badges = [];
   String _name = '';
   String _email = '';
   int _xp = 0;
   int _streak = 0;
   bool _isLoading = true;
+  String _badgeLabel(String id) {
+    switch (id) {
+      case 'istikrar':
+        return 'İstikrar Rozeti 🏆 (7 Gün)';
+      case 'azimli':
+        return 'Azimli Rozeti 🥇 (20 Görev)';
+      case 'ilk_gorev':
+        return 'İlk Adım Rozeti 🎉';
+      case 'onluk':
+        return 'On’uncu Görev Rozeti 🔟';
+      case 'elli':
+        return 'Elli Görev Rozeti 🏅';
+      case 'aylik_sadakat':
+        return 'Aylık Sadakat Rozeti 📅 (30 Gün)';
+      case 'sosyal':
+        return 'Sosyal Kuş Rozeti 🕊️ (10 Arkadaş)';
+      case 'sadakat':
+        return 'Sadakat Rozeti 🥇 (1 Yıl)';
+      default:
+        return 'Bilinmeyen Rozet';
+    }
+  }
 
   @override
   void initState() {
@@ -37,6 +60,8 @@ class _FriendProfilePageState extends State<FriendProfilePage> {
       _email = data['email'] ?? '';
       _xp = data['xp'] ?? 0;
       _streak = data['streak'] ?? 0;
+      _avatarUrl = data['avatarUrl'] as String?; // ← burada ata
+      _badges = List<String>.from(data['badges'] ?? []); // ← üye değişkene ata
       _isLoading = false;
     });
   }
@@ -141,11 +166,20 @@ class _FriendProfilePageState extends State<FriendProfilePage> {
                           child: CircleAvatar(
                             radius: 40,
                             backgroundColor: Colors.lightBlue,
-                            child: const Icon(
-                              Icons.person,
-                              size: 40,
-                              color: Colors.white,
-                            ),
+                            backgroundImage:
+                                _avatarUrl != null
+                                    ? NetworkImage(
+                                      _avatarUrl!,
+                                    ) // ← URL varsa göster
+                                    : null, // yoksa default icon
+                            child:
+                                _avatarUrl == null
+                                    ? const Icon(
+                                      Icons.person,
+                                      size: 40,
+                                      color: Colors.white,
+                                    )
+                                    : null,
                           ),
                         ),
 
@@ -187,6 +221,32 @@ class _FriendProfilePageState extends State<FriendProfilePage> {
                                 'Streak: $_streak gün',
                                 style: const TextStyle(fontSize: 18),
                               ),
+                              const SizedBox(height: 8),
+
+                              if (_badges.isNotEmpty) ...[
+                                const Text(
+                                  '🎖 Rozetler',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Wrap(
+                                  spacing: 8,
+                                  children:
+                                      _badges
+                                          .map(
+                                            (id) => Chip(
+                                              label: Text(_badgeLabel(id)),
+                                              backgroundColor:
+                                                  Colors.yellow.shade100,
+                                            ),
+                                          )
+                                          .toList(),
+                                ),
+                                const SizedBox(height: 8),
+                              ],
                             ],
                           ),
                         ),

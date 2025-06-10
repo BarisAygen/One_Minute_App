@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class VerifyEmailPage extends StatefulWidget {
   const VerifyEmailPage({Key? key}) : super(key: key);
+
   @override
   _VerifyEmailPageState createState() => _VerifyEmailPageState();
 }
@@ -10,7 +11,15 @@ class VerifyEmailPage extends StatefulWidget {
 class _VerifyEmailPageState extends State<VerifyEmailPage> {
   bool _isSending = false;
   bool _isChecking = false;
+  bool _isEditingEmail = false;
+  final _editEmailCtrl = TextEditingController();
   final user = FirebaseAuth.instance.currentUser!;
+
+  @override
+  void dispose() {
+    _editEmailCtrl.dispose();
+    super.dispose();
+  }
 
   Future<void> _sendAgain() async {
     setState(() => _isSending = true);
@@ -32,7 +41,29 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
   }
 
   void _editEmail() {
-    Navigator.pushReplacementNamed(context, '/auth');
+    setState(() => _isEditingEmail = true);
+  }
+
+  Future<void> _submitNewEmail() async {
+    final newEmail = _editEmailCtrl.text.trim();
+    if (newEmail.isEmpty) return;
+
+    setState(() => _isSending = true);
+    try {
+      await user.updateEmail(newEmail);
+      await user.sendEmailVerification();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Doğrulama maili yenilendi.')),
+      );
+      setState(() => _isEditingEmail = false);
+      _editEmailCtrl.clear();
+    } on FirebaseAuthException catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.message ?? 'Bir hata oluştu')));
+    } finally {
+      setState(() => _isSending = false);
+    }
   }
 
   @override
@@ -54,7 +85,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Yellow Header Card
+                  // Header Card
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 24),
@@ -83,81 +114,112 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 32),
 
-                  // Instruction Card
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Colors.black12,
-                          blurRadius: 6,
-                          offset: Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: const Text(
-                      'Lütfen e-postanıza gelen doğrulama bağlantısını tıklayın.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
-
-                  const SizedBox(height: 32),
-
-                  // Check Verification Button
-                  SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: ElevatedButton(
-                      onPressed: _isChecking ? null : _checkNow,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.lightBlue,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        elevation: 4,
+                  // Content based on mode
+                  if (_isEditingEmail) ...[
+                    TextField(
+                      controller: _editEmailCtrl,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: const InputDecoration(
+                        labelText: 'Yeni e-posta',
+                        prefixIcon: Icon(Icons.email),
                       ),
+                    ),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton(
+                        onPressed: _isSending ? null : _submitNewEmail,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.lightBlue,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 4,
+                        ),
+                        child:
+                            _isSending
+                                ? const CircularProgressIndicator(
+                                  color: Colors.white,
+                                )
+                                : const Text(
+                                  'Doğrulama Maili Gönder',
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () => setState(() => _isEditingEmail = false),
+                      child: const Text('İptal'),
+                    ),
+                  ] else ...[
+                    // Instruction Card
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 6,
+                            offset: Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: const Text(
+                        'Lütfen e-postanıza gelen doğrulama bağlantısını tıklayın.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton(
+                        onPressed: _isChecking ? null : _checkNow,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.lightBlue,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 4,
+                        ),
+                        child:
+                            _isChecking
+                                ? const CircularProgressIndicator(
+                                  color: Colors.white,
+                                )
+                                : const Text(
+                                  'Doğrulamayı Kontrol Et',
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextButton(
+                      onPressed: _isSending ? null : _sendAgain,
                       child:
-                          _isChecking
-                              ? const CircularProgressIndicator(
-                                color: Colors.white,
-                              )
-                              : const Text(
-                                'Doğrulamayı Kontrol Et',
-                                style: TextStyle(fontSize: 16),
-                              ),
+                          _isSending
+                              ? const CircularProgressIndicator()
+                              : const Text('Maili Tekrar Gönder'),
                     ),
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  // Resend Email Button
-                  TextButton(
-                    onPressed: _isSending ? null : _sendAgain,
-                    child:
-                        _isSending
-                            ? const CircularProgressIndicator()
-                            : const Text('Maili Tekrar Gönder'),
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  // Edit Email Link
-                  TextButton.icon(
-                    onPressed: _editEmail,
-                    icon: const Icon(Icons.edit, color: Colors.blueAccent),
-                    label: const Text(
-                      'E-postayı Düzenle',
-                      style: TextStyle(color: Colors.blueAccent),
+                    const SizedBox(height: 8),
+                    TextButton.icon(
+                      onPressed: _editEmail,
+                      icon: const Icon(Icons.edit, color: Colors.blueAccent),
+                      label: const Text(
+                        'E-postayı Düzenle',
+                        style: TextStyle(color: Colors.blueAccent),
+                      ),
                     ),
-                  ),
+                  ],
                 ],
               ),
             ),

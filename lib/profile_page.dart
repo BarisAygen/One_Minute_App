@@ -19,14 +19,35 @@ class _ProfilePageState extends State<ProfilePage> {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   String? _avatarUrl;
   final _picker = ImagePicker();
-
   String name = '';
   int xp = 0;
   int level = 1;
   int streak = 0;
   List<String> badges = [];
-
   bool isLoading = true;
+
+  String _badgeLabel(String id) {
+    switch (id) {
+      case 'istikrar':
+        return 'İstikrar Rozeti 🏆 (7 Gün)';
+      case 'azimli':
+        return 'Azimli Rozeti 🥇 (20 Görev)';
+      case 'ilk_gorev':
+        return 'İlk Adım Rozeti 🎉';
+      case 'onluk':
+        return 'On’uncu Görev Rozeti 🔟';
+      case 'elli':
+        return 'Elli Görev Rozeti 🏅';
+      case 'aylik_sadakat':
+        return 'Aylık Sadakat Rozeti 📅 (30 Gün)';
+      case 'sosyal':
+        return 'Sosyal Kuş Rozeti 🕊️ (10 Arkadaş)';
+      case 'sadakat':
+        return 'Sadakat Rozeti 🥇 (1 Yıl)';
+      default:
+        return 'Bilinmeyen Rozet';
+    }
+  }
 
   @override
   void initState() {
@@ -46,21 +67,6 @@ class _ProfilePageState extends State<ProfilePage> {
       badges = List<String>.from(data['badges'] ?? []);
       isLoading = false;
     });
-  }
-
-  String _badgeLabel(String id) {
-    switch (id) {
-      case 'istikrar':
-        return 'İstikrar Rozeti 🏆 (7 Gün)';
-      case 'azimli':
-        return 'Azimli Rozet 🥇 (20 Görev)';
-      case 'erkencan':
-        return 'Erken Can Rozeti ☀️ (Öğlene Kadar)';
-      case 'geri_don':
-        return 'Geri Dön Rozeti 🔄 (3 Günde Devam)';
-      default:
-        return id;
-    }
   }
 
   Future<void> _signOut() async {
@@ -154,8 +160,8 @@ class _ProfilePageState extends State<ProfilePage> {
         child:
             isLoading
                 ? const Center(child: CircularProgressIndicator())
-                : Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                : ListView(
+                  padding: const EdgeInsets.all(24),
                   children: [
                     // Avatar
                     Center(
