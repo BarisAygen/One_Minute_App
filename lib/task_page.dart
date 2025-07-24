@@ -241,7 +241,7 @@ class _TaskPageState extends State<TaskPage> {
                             'Görevin',
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              fontSize: 22,
+                              fontSize: 32, // was 22
                               fontWeight: FontWeight.bold,
                               color: Colors.white, // 🔁 Beyaz metin
                             ),
@@ -271,8 +271,8 @@ class _TaskPageState extends State<TaskPage> {
                                 taskText ?? 'Bugün için görev bulunamadı.',
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w500,
+                                  fontSize: 28, // was 20
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ),
@@ -290,19 +290,27 @@ class _TaskPageState extends State<TaskPage> {
                             icon: Icon(
                               isCompleted ? Icons.check_circle : Icons.check,
                               color: Colors.white,
+                              size: 32, // was default
                             ),
                             label: Text(
                               isCompleted ? 'Tamamlandı' : 'Görevi Tamamla',
-                              style: const TextStyle(fontSize: 18),
+                              style: const TextStyle(fontSize: 24), // was 18
                             ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor:
                                   isCompleted ? Colors.grey : Colors.lightBlue,
                               foregroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(
+                                  16,
+                                ), // was 12
                               ),
-                              elevation: 4,
+                              elevation: 6,
+                              minimumSize: const Size.fromHeight(64), // was 50
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 20,
+                                horizontal: 32,
+                              ),
                             ),
                           ),
                         ),

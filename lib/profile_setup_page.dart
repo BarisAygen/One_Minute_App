@@ -42,6 +42,37 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
       'type': 'choice',
       'options': ['Nadiren', 'Haftada birkaç kez', 'Her gün'],
     },
+    // Yeni Türkçe sorular
+    {
+      'key': 'phone',
+      'question': 'Günde kaç saat telefon kullanıyorsunuz?',
+      'type': 'choice',
+      'options': ['1 saatten az', '1-3 saat', '4-6 saat', '6+ saat'],
+    },
+    {
+      'key': 'sleep',
+      'question': 'Geceleri ortalama kaç saat uyuyorsunuz?',
+      'type': 'choice',
+      'options': ['4-6', '6-8', '8+'],
+    },
+    {
+      'key': 'break',
+      'question': 'Gün içinde ne sıklıkla kısa mola verirsiniz?',
+      'type': 'choice',
+      'options': ['Hiç', 'Nadiren', 'Sık sık'],
+    },
+    {
+      'key': 'toilet',
+      'question': 'Tuvalete gıderken telefonunu da yanına alır mısın?',
+      'type': 'choice',
+      'options': ['Hiç', 'Nadiren', 'Hep alırım'],
+    },
+    {
+      'key': 'dinner',
+      'question': 'Yemek yerken bir şey izleme ihtiyacı duyuyor musun?',
+      'type': 'choice',
+      'options': ['Hiç', 'Nadiren', 'Her zaman'],
+    },
   ];
 
   void handleAnswer(String? answer) async {
@@ -126,17 +157,28 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
                   ...List.generate(
                     (current['options'] as List).length,
                     (i) => Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 6),
-                      child: ElevatedButton(
-                        onPressed: () => handleAnswer(current['options'][i]),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.lightBlue,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: 60,
+                        child: ElevatedButton(
+                          onPressed: () => handleAnswer(current['options'][i]),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.lightBlue,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            elevation: 4,
+                          ),
+                          child: Text(
+                            current['options'][i],
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
-                        child: Text(current['options'][i]),
                       ),
                     ),
                   ),
