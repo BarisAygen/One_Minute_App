@@ -6,7 +6,7 @@ import 'package:one_minute_app/invite_requests_page.dart';
 import 'package:one_minute_app/AddFriend_page.dart';
 
 class FriendsPage extends StatefulWidget {
-  const FriendsPage({Key? key}) : super(key: key);
+  const FriendsPage({super.key});
 
   @override
   State<FriendsPage> createState() => _FriendsPageState();
@@ -101,8 +101,9 @@ class _FriendsPageState extends State<FriendsPage> {
                           .collection('friends')
                           .snapshots(),
                   builder: (ctx, snap) {
-                    if (!snap.hasData)
+                    if (!snap.hasData) {
                       return const Center(child: CircularProgressIndicator());
+                    }
                     final friends = snap.data!.docs;
                     if (friends.isEmpty) {
                       return Center(

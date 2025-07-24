@@ -4,8 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class FriendProfilePage extends StatefulWidget {
   final String friendUid;
-  const FriendProfilePage({Key? key, required this.friendUid})
-    : super(key: key);
+  const FriendProfilePage({super.key, required this.friendUid});
 
   @override
   State<FriendProfilePage> createState() => _FriendProfilePageState();

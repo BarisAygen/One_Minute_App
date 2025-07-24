@@ -4,7 +4,7 @@ import 'auth_service.dart';
 /// if true → show **Login** first; if false → show **Sign Up** first
 class AuthPage extends StatefulWidget {
   final bool initialIsLogin;
-  const AuthPage({Key? key, this.initialIsLogin = true}) : super(key: key);
+  const AuthPage({super.key, this.initialIsLogin = true});
 
   @override
   State<AuthPage> createState() => _AuthPageState();

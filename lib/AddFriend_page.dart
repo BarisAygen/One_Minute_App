@@ -36,7 +36,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
         await _firestore
             .collection('users')
             .where('name', isGreaterThanOrEqualTo: query)
-            .where('name', isLessThanOrEqualTo: query + '\uf8ff')
+            .where('name', isLessThanOrEqualTo: '$query\uf8ff')
             .get();
 
     // Combine, exclude self
@@ -165,7 +165,6 @@ class _AddFriendPageState extends State<AddFriendPage> {
                                 subtitle: Text(data['email'] ?? ''),
                                 trailing: ElevatedButton(
                                   onPressed: () => _sendRequest(doc),
-                                  child: const Text('Davet Gönder'),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.lightBlue,
                                     foregroundColor: Colors.white,
@@ -173,6 +172,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                   ),
+                                  child: const Text('Davet Gönder'),
                                 ),
                               );
                             },
