@@ -1,4 +1,4 @@
-In this app, users signup with their emails.
+In this app, built as a learning-oriented project to practice Firebase, backend, and mobile development with Flutter, users sign up with their emails.
 Each user gets a daily 1-minute task at the same time.
-They level up and get badges by doing tasks.
-They can friends and see each others' profiles.
+By completing tasks, they level up and earn badges.
+They can also add friends and view each other’s profiles.
